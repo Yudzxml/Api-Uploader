@@ -91,6 +91,29 @@
       font-size: 0.9rem;
     }
 
+    /* Loading Spinner Style */
+    .loading {
+      display: none;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Center align footer */
+    .footer p {
+      text-align: center;
+      margin: 0;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 1.5rem;
@@ -117,6 +140,9 @@
       <button type="submit">Upload</button>
     </form>
 
+    <!-- Loading Spinner -->
+    <div class="loading" id="loadingSpinner"></div>
+
     <h3>Response:</h3>
     <pre id="responseBox">Belum ada upload</pre>
   </div>
@@ -128,6 +154,7 @@
   <script>
     const form = document.getElementById('uploadForm');
     const responseBox = document.getElementById('responseBox');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -135,23 +162,28 @@
 
       if (!file) return alert('Pilih file terlebih dahulu!');
 
+      // Show loading spinner
+      loadingSpinner.style.display = 'block';
+      responseBox.textContent = 'Uploading... Please wait.';
+
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result.split(',')[1];
 
         const res = await fetch('https://api-upload-cyan.vercel.app//api/upload', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    fileName: file.name,
-    content: base64
-  })
-});
-
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileName: file.name,
+            content: base64
+          })
+        });
 
         const result = await res.json();
+        console.log(result)
+        loadingSpinner.style.display = 'none';
         responseBox.textContent = JSON.stringify(result, null, 2);
       };
 
