@@ -55,9 +55,6 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    .preview {
-      margin-top: 1rem;
-    }
     pre {
       text-align: left;
       white-space: pre-wrap;
@@ -65,9 +62,9 @@
       padding: 1rem;
       border-radius: 8px;
       font-size: 0.9rem;
+      word-wrap: break-word;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 
@@ -84,45 +81,63 @@
     <pre id="responseBox">Belum ada upload</pre>
 
     <button id="copyBtn" style="display:none;">Copy URL</button>
-    <div class="preview" id="filePreview"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
     const form = document.getElementById('uploadForm');
     const responseBox = document.getElementById('responseBox');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const copyBtn = document.getElementById('copyBtn');
-    const preview = document.getElementById('filePreview');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const file = document.getElementById('fileInput').files[0];
 
       if (!file) return alert('Pilih file terlebih dahulu!');
-      if (file.size > MAX_FILE_SIZE) return alert('Ukuran maksimal 20MB');
+      if (file.size > MAX_FILE_SIZE) return alert('Ukuran maksimal 100MB');
 
       loadingSpinner.style.display = 'block';
       responseBox.textContent = 'Uploading...';
-      preview.innerHTML = '';
       copyBtn.style.display = 'none';
 
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result.split(',')[1];
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
 
+      try {
+        const response = await axios.post('https://api-upload-cyan.vercel.app/api/upload', uint8Array, {
+          headers: {
+            'Content-Type': 'application/octet-stream',
+            'x-filename': file.name
+          }
+        });
+
+        const url = response.data.url;
+        responseBox.textContent = JSON.stringify(response.data, null, 2);
+        copyBtn.style.display = 'block';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(url);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
+        };
+
+      } catch (error) {
+        console.error('Axios failed, trying fetch:', error);
         try {
-          const response = await axios.post('https://api-upload-cyan.vercel.app/api/upload', {
-            fileName: file.name,
-            content: base64
-          }, {
+          const res = await fetch('https://api-upload-cyan.vercel.app/api/upload', {
+            method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/octet-stream',
+              'x-filename': file.name
+            },
+            body: uint8Array
           });
 
-          const url = response.data.url;
-          responseBox.textContent = JSON.stringify(response.data, null, 2);
+          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+          const data = await res.json();
+          const url = data.url;
+          responseBox.textContent = JSON.stringify(data, null, 2);
           copyBtn.style.display = 'block';
           copyBtn.onclick = () => {
             navigator.clipboard.writeText(url);
@@ -130,36 +145,13 @@
             setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
           };
 
-          const type = file.type;
-          if (type.startsWith('image/')) {
-            preview.innerHTML = `<img src="${url}" alt="Image preview" style="max-width:100%; border-radius: 8px;" />`;
-          } else if (type.startsWith('video/')) {
-            preview.innerHTML = `<video controls style="max-width:100%; border-radius: 8px;">
-                                  <source src="${url}" type="${type}">Video tidak didukung
-                                </video>`;
-          } else if (type.startsWith('audio/')) {
-            preview.innerHTML = `<audio controls style="width:100%">
-                                  <source src="${url}" type="${type}">Audio tidak didukung
-                                </audio>`;
-          } else {
-            preview.textContent = 'Preview tidak tersedia untuk jenis file ini.';
-          }
-
-        } catch (error) {
-          console.error('Error uploading file:', error);
-          if (error.response) {
-            console.error('Response data:', error.response.data);
-          } else if (error.request) {
-            console.error('Request error:', error.request);
-          } else {
-            console.error('General error:', error.message);
-          }
-          responseBox.textContent = `Error: ${error.message}`;
-        } finally {
-          loadingSpinner.style.display = 'none';
+        } catch (fetchError) {
+          console.error('Fetch failed:', fetchError);
+          responseBox.textContent = `Error: ${fetchError.message}`;
         }
-      };
-      reader.readAsDataURL(file);
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
     });
   </script>
 </body>
