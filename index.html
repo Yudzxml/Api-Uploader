@@ -4,155 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Upload File ke GitHub</title>
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #e9f2f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      flex-direction: column;
-      text-align: center;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
-      width: 100%;
-    }
-    input[type="file"], button {
-      padding: 12px;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      cursor: pointer;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .loading {
-      display: none;
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #007bff;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 1rem auto;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    pre {
-      text-align: left;
-      white-space: pre-wrap;
-      background: #f9f9f9;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      word-wrap: break-word;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <div class="container">
-    <h1>Upload File ke GitHub</h1>
+    <h1>UPTOGIT BY YUDZXML</h1>
     <form id="uploadForm">
-      <input type="file" id="fileInput" required />
-      <button type="submit">Upload</button>
+      <input type="file" id="fileInput" required accept="*/*" />
+      <button type="submit">UPLOAD</button>
     </form>
 
     <div class="loading" id="loadingSpinner"></div>
 
-    <h3>Response:</h3>
-    <pre id="responseBox">Belum ada upload</pre>
+    <h3>FILE RESPON</h3>
+    <pre id="responseBox">Upload File Terlebih Dahulu</pre>
 
-    <button id="copyBtn" style="display:none;">Copy URL</button>
+    <button id="copyBtn">Copy URL</button>
   </div>
 
+  <footer class="footer" id="footer"></footer>
+  <button id="modeToggle">Mode Malam</button>
+
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-    const MAX_FILE_SIZE = 100 * 1024 * 1024;
-    const form = document.getElementById('uploadForm');
-    const responseBox = document.getElementById('responseBox');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const copyBtn = document.getElementById('copyBtn');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const file = document.getElementById('fileInput').files[0];
-
-      if (!file) return alert('Pilih file terlebih dahulu!');
-      if (file.size > MAX_FILE_SIZE) return alert('Ukuran maksimal 100MB');
-
-      loadingSpinner.style.display = 'block';
-      responseBox.textContent = 'Uploading...';
-      copyBtn.style.display = 'none';
-
-      const arrayBuffer = await file.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-
-      try {
-        const response = await axios.post('https://api-upload-cyan.vercel.app/api/upload', uint8Array, {
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'x-filename': file.name
-          }
-        });
-
-        const url = response.data.url;
-        responseBox.textContent = JSON.stringify(response.data, null, 2);
-        copyBtn.style.display = 'block';
-        copyBtn.onclick = () => {
-          navigator.clipboard.writeText(url);
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
-        };
-
-      } catch (error) {
-        console.error('Axios failed, trying fetch:', error);
-        try {
-          const res = await fetch('https://api-upload-cyan.vercel.app/api/upload', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/octet-stream',
-              'x-filename': file.name
-            },
-            body: uint8Array
-          });
-
-          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-          const data = await res.json();
-          const url = data.url;
-          responseBox.textContent = JSON.stringify(data, null, 2);
-          copyBtn.style.display = 'block';
-          copyBtn.onclick = () => {
-            navigator.clipboard.writeText(url);
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
-          };
-
-        } catch (fetchError) {
-          console.error('Fetch failed:', fetchError);
-          responseBox.textContent = `Error: ${fetchError.message}`;
-        }
-      } finally {
-        loadingSpinner.style.display = 'none';
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
