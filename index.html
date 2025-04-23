@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Upload File ke GitHub</title>
   <style>
     body {
@@ -91,7 +91,11 @@
       font-size: 0.9rem;
     }
 
-    /* Loading Spinner Style */
+    .footer p {
+      text-align: center;
+      margin: 0;
+    }
+
     .loading {
       display: none;
       border: 8px solid #f3f3f3;
@@ -108,12 +112,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Center align footer */
-    .footer p {
-      text-align: center;
-      margin: 0;
-    }
-
     @media (max-width: 600px) {
       h1 {
         font-size: 1.5rem;
@@ -128,6 +126,9 @@
       }
     }
   </style>
+
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 
@@ -140,7 +141,6 @@
       <button type="submit">Upload</button>
     </form>
 
-    <!-- Loading Spinner -->
     <div class="loading" id="loadingSpinner"></div>
 
     <h3>Response:</h3>
@@ -162,7 +162,6 @@
 
       if (!file) return alert('Pilih file terlebih dahulu!');
 
-      // Show loading spinner
       loadingSpinner.style.display = 'block';
       responseBox.textContent = 'Uploading... Please wait.';
 
@@ -170,21 +169,22 @@
       reader.onloadend = async () => {
         const base64 = reader.result.split(',')[1];
 
-        const res = await fetch('https://api-upload-cyan.vercel.app//api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        try {
+          const response = await axios.post('https://api-upload-cyan.vercel.app/api/upload', {
             fileName: file.name,
             content: base64
-          })
-        });
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
 
-        const result = await res.json();
-        console.log(result)
-        loadingSpinner.style.display = 'none';
-        responseBox.textContent = JSON.stringify(result, null, 2);
+          loadingSpinner.style.display = 'none';
+          responseBox.textContent = JSON.stringify(response.data, null, 2);
+        } catch (error) {
+          loadingSpinner.style.display = 'none';
+          responseBox.textContent = `Error: ${error.response?.data?.message || error.message}`;
+        }
       };
 
       reader.readAsDataURL(file);
