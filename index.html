@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File ke GitHub</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #e9f2f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: #007bff;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #666;
+    }
+
+    input[type="file"] {
+      padding: 12px;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      width: 100%;
+      background-color: #f7f7f7;
+      cursor: pointer;
+    }
+
+    input[type="file"]:hover {
+      border-color: #007bff;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    h3 {
+      margin-top: 2rem;
+      color: #333;
+      font-size: 1.3rem;
+    }
+
+    pre {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      color: #333;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      button {
+        font-size: 1rem;
+      }
+
+      input[type="file"] {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Upload File ke GitHub</h1>
+    <p>Upload file Anda untuk disimpan langsung ke GitHub!</p>
+
+    <form id="uploadForm">
+      <input type="file" id="fileInput" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h3>Response:</h3>
+    <pre id="responseBox">Belum ada upload</pre>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 Upload ke GitHub By Yudzxml. All rights reserved.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const responseBox = document.getElementById('responseBox');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('fileInput').files[0];
+
+      if (!file) return alert('Pilih file terlebih dahulu!');
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result.split(',')[1];
+
+        const res = await fetch('https://api-upload-cyan.vercel.app//api/upload', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    fileName: file.name,
+    content: base64
+  })
+});
+
+
+        const result = await res.json();
+        responseBox.textContent = JSON.stringify(result, null, 2);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+
+</body>
+</html>
