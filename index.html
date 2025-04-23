@@ -8,134 +8,71 @@
     body {
       font-family: 'Roboto', sans-serif;
       background-color: #e9f2f7;
-      color: #333;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       flex-direction: column;
       text-align: center;
     }
-
     .container {
-      background-color: #fff;
+      background: #fff;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-      width: 100%;
       max-width: 500px;
+      width: 100%;
     }
-
-    h1 {
-      color: #007bff;
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
-    }
-
-    p {
-      font-size: 1rem;
-      color: #666;
-    }
-
-    input[type="file"] {
+    input[type="file"], button {
       padding: 12px;
-      font-size: 1.2rem;
+      font-size: 1rem;
       margin-bottom: 1rem;
+      width: 100%;
       border-radius: 8px;
       border: 1px solid #ddd;
-      width: 100%;
-      background-color: #f7f7f7;
       cursor: pointer;
     }
-
-    input[type="file"]:hover {
-      border-color: #007bff;
-    }
-
     button {
       background-color: #007bff;
       color: white;
-      padding: 12px;
-      font-size: 1.2rem;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      transition: background-color 0.3s;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
-    h3 {
-      margin-top: 2rem;
-      color: #333;
-      font-size: 1.3rem;
-    }
-
-    pre {
-      background-color: #f0f0f0;
-      padding: 1rem;
-      border-radius: 8px;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      color: #333;
-    }
-
-    .footer {
-      margin-top: 2rem;
-      color: #666;
-      font-size: 0.9rem;
-    }
-
-    .footer p {
-      text-align: center;
-      margin: 0;
-    }
-
     .loading {
       display: none;
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #007bff;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
       border-radius: 50%;
       width: 40px;
       height: 40px;
-      animation: spin 2s linear infinite;
-      margin: 20px auto;
+      animation: spin 1s linear infinite;
+      margin: 1rem auto;
     }
-
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      to { transform: rotate(360deg); }
     }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      button {
-        font-size: 1rem;
-      }
-
-      input[type="file"] {
-        font-size: 1rem;
-      }
+    .preview {
+      margin-top: 1rem;
+    }
+    pre {
+      text-align: left;
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
     }
   </style>
-
-  <!-- Axios CDN -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 
   <div class="container">
     <h1>Upload File ke GitHub</h1>
-    <p>Upload file Anda untuk disimpan langsung ke GitHub!</p>
-
     <form id="uploadForm">
       <input type="file" id="fileInput" required />
       <button type="submit">Upload</button>
@@ -145,25 +82,30 @@
 
     <h3>Response:</h3>
     <pre id="responseBox">Belum ada upload</pre>
-  </div>
 
-  <div class="footer">
-    <p>&copy; 2025 Upload ke GitHub By Yudzxml. All rights reserved.</p>
+    <button id="copyBtn" style="display:none;">Copy URL</button>
+    <div class="preview" id="filePreview"></div>
   </div>
 
   <script>
+    const MAX_FILE_SIZE = 20 * 1024 * 1024;
     const form = document.getElementById('uploadForm');
     const responseBox = document.getElementById('responseBox');
     const loadingSpinner = document.getElementById('loadingSpinner');
+    const copyBtn = document.getElementById('copyBtn');
+    const preview = document.getElementById('filePreview');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const file = document.getElementById('fileInput').files[0];
 
       if (!file) return alert('Pilih file terlebih dahulu!');
+      if (file.size > MAX_FILE_SIZE) return alert('Ukuran maksimal 20MB');
 
       loadingSpinner.style.display = 'block';
-      responseBox.textContent = 'Uploading... Please wait.';
+      responseBox.textContent = 'Uploading...';
+      preview.innerHTML = '';
+      copyBtn.style.display = 'none';
 
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -179,17 +121,46 @@
             }
           });
 
-          loadingSpinner.style.display = 'none';
+          const url = response.data.url;
           responseBox.textContent = JSON.stringify(response.data, null, 2);
+          copyBtn.style.display = 'block';
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(url);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy URL', 1500);
+          };
+
+          const type = file.type;
+          if (type.startsWith('image/')) {
+            preview.innerHTML = `<img src="${url}" alt="Image preview" style="max-width:100%; border-radius: 8px;" />`;
+          } else if (type.startsWith('video/')) {
+            preview.innerHTML = `<video controls style="max-width:100%; border-radius: 8px;">
+                                  <source src="${url}" type="${type}">Video tidak didukung
+                                </video>`;
+          } else if (type.startsWith('audio/')) {
+            preview.innerHTML = `<audio controls style="width:100%">
+                                  <source src="${url}" type="${type}">Audio tidak didukung
+                                </audio>`;
+          } else {
+            preview.textContent = 'Preview tidak tersedia untuk jenis file ini.';
+          }
+
         } catch (error) {
+          console.error('Error uploading file:', error);
+          if (error.response) {
+            console.error('Response data:', error.response.data);
+          } else if (error.request) {
+            console.error('Request error:', error.request);
+          } else {
+            console.error('General error:', error.message);
+          }
+          responseBox.textContent = `Error: ${error.message}`;
+        } finally {
           loadingSpinner.style.display = 'none';
-          responseBox.textContent = `Error: ${error.response?.data?.message || error.message}`;
         }
       };
-
       reader.readAsDataURL(file);
     });
   </script>
-
 </body>
 </html>
