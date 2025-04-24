@@ -55,7 +55,7 @@ form.addEventListener('submit', async (e) => {
       }
     });
 
-    const url = response.data.url;
+    const url = response.data.data.url;
     responseBox.textContent = JSON.stringify(response.data, null, 2);
     showCopyButton(url);
 
