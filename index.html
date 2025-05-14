@@ -3,31 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload File ke GitHub</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>WORKERZ REPO BY YUDZXML</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div class="container">
-    <h1>UPTOGIT BY YUDZXML</h1>
-    <form id="uploadForm">
-      <input type="file" id="fileInput" required accept="*/*" />
-      <button type="submit">UPLOAD</button>
+    <h1>ADD ACCESS SCRIPT X7BOTZ</h1>
+
+    <form id="updateForm">
+      <label for="key">Key (opsional)</label>
+      <input type="text" id="key" placeholder="Key baru (boleh kosong)" />
+
+      <label for="phones">Nomor HP (pisahkan dengan koma)</label>
+      <textarea id="phones" rows="4" placeholder="Contoh: 6281234567890,6289876543210" required></textarea>
+
+      <button type="submit">ADD NUMBER</button>
     </form>
 
-    <div class="loading" id="loadingSpinner"></div>
+    <hr />
 
-    <h3>FILE RESPON</h3>
-    <pre id="responseBox">Upload File Terlebih Dahulu</pre>
+    <h2>HAPUS NOMOR</h2>
+    <form id="hapusForm">
+      <label for="hapusPhones">Nomor HP yang ingin dihapus (pisahkan dengan koma)</label>
+      <textarea id="hapusPhones" rows="3" placeholder="6281234567890,6289876543210" required></textarea>
+      <button type="submit">HAPUS NOMOR</button>
+    </form>
 
-    <button id="copyBtn">Copy URL</button>
+    <p id="status"></p>
   </div>
 
-  <footer class="footer" id="footer"></footer>
-  <button id="modeToggle">Mode Malam</button>
+  <!-- Audio autoplay saat user klik -->
+  <audio id="bgAudio" src="https://github.com/Yudzxml/UploaderV2/raw/refs/heads/main/tmp/56ec46ac.mp3" preload="auto"></audio>
+  <script>
+    document.body.addEventListener('click', function playAudioOnce() {
+      const audio = document.getElementById('bgAudio');
+      audio.play().catch(() => {});
+      document.body.removeEventListener('click', playAudioOnce);
+    });
+  </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <footer>
+    <p>&copy; 2025 Yudzxml. All rights reserved.</p>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
