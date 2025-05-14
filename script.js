@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyBtn = document.getElementById('copyBtn');
   const footer = document.getElementById('footer');
 
-  footer.innerHTML = `&copy; ${new Date().getFullYear()} Uploader To Github By Yudzxml. All rights reserved.`;
+  footer.innerHTML = `&copy; 2025 Yudzxml Made With ♥️`;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
