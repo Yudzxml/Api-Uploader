@@ -3,49 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WORKERZ REPO BY YUDZXML</title>
+  <title>Uptogit by YUDZXML</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <h1>ADD ACCESS SCRIPT X7BOTZ</h1>
 
-    <form id="updateForm">
-      <label for="key">Key (opsional)</label>
-      <input type="text" id="key" placeholder="Key baru (boleh kosong)" />
+  <main class="container">
+    <h1 class="title">UPTOGIT BY YUDZXML</h1>
 
-      <label for="phones">Nomor HP (pisahkan dengan koma)</label>
-      <textarea id="phones" rows="4" placeholder="Contoh: 6281234567890,6289876543210" required></textarea>
-
-      <button type="submit">ADD NUMBER</button>
+    <form id="uploadForm" class="upload-form">
+      <input type="file" id="fileInput" required accept="*/*" />
+      <button type="submit" class="upload-btn">Upload</button>
     </form>
 
-    <hr />
+    <div id="loadingSpinner" class="loading"></div>
 
-    <h2>HAPUS NOMOR</h2>
-    <form id="hapusForm">
-      <label for="hapusPhones">Nomor HP yang ingin dihapus (pisahkan dengan koma)</label>
-      <textarea id="hapusPhones" rows="3" placeholder="6281234567890,6289876543210" required></textarea>
-      <button type="submit">HAPUS NOMOR</button>
-    </form>
+    <section class="response-container">
+      <h3 class="section-title">File Respon</h3>
+      <pre id="responseBox">Upload file terlebih dahulu</pre>
+    </section>
 
-    <p id="status"></p>
-  </div>
+    <div class="actions">
+      <button id="copyBtn" class="action-btn">Copy URL</button>
+    </div>
+  </main>
 
-  <!-- Audio autoplay saat user klik -->
-  <audio id="bgAudio" src="https://github.com/Yudzxml/UploaderV2/raw/refs/heads/main/tmp/56ec46ac.mp3" preload="auto"></audio>
-  <script>
-    document.body.addEventListener('click', function playAudioOnce() {
-      const audio = document.getElementById('bgAudio');
-      audio.play().catch(() => {});
-      document.body.removeEventListener('click', playAudioOnce);
-    });
-  </script>
-
-  <footer>
-    <p>&copy; 2025 Yudzxml. All rights reserved.</p>
+  <footer class="footer">
+    &copy; 2025 Yudzxml Made With ♥️
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
